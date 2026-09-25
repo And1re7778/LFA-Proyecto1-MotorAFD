@@ -14,41 +14,51 @@ namespace ProyectoAutomata {
                 Console.WriteLine("==============================================");
                 Console.WriteLine("                    MENÚ                      ");
                 Console.WriteLine();
-                Console.WriteLine("1. Cargar quintúpla desde archivo (.txt)");
-                Console.WriteLine("2. Ingresar quintúpla manualmente");
-                Console.WriteLine("3. Mostrar definición formal y tabla de transisión");
-                Console.WriteLine("4. Evaluar cadena individual");
-                Console.WriteLine("5. Evaluar lote de cadenas (desde archivo .txt)");
-                Console.WriteLine("6. Reiniciar / Cargar nuevo autómata");
-                Console.WriteLine("7. Salir");
+                Console.WriteLine("1. Cargar quintúpla AFD desde archivo (.txt)");
+                Console.WriteLine("2. Cargar quintúpla AFND desde archivo (.txt)");
+                Console.WriteLine("3. Ingresar quintúpla AFD manualmente");
+                Console.WriteLine("4. Ingresar quintúpla AFND manualmente");
+                Console.WriteLine("5. Mostrar definición formal y tabla de transisión");
+                Console.WriteLine("6. Evaluar cadena individual");
+                Console.WriteLine("7. Evaluar lote de cadenas (desde archivo .txt)");
+                Console.WriteLine("8. Reiniciar / Cargar nuevo autómata");
+                Console.WriteLine("9. Salir");
                 Console.WriteLine();
                 Console.Write("Seleccione una opción: ");
 
                 string opcion = Console.ReadLine();
 
                 switch (opcion) {
-                    // cargar quitupla desde archivo
+                    // cargar quitupla desde archivo AFD
                     case "1":
                         CargarDesdeArchivo(automata);
                         break;
-                    // ingresar quintupla manualmente
+                    // cargar quitupla desde archivo AFND
                     case "2":
+                        automata = CargarAFNDDesdeArchivo();
+                        break;
+                    // ingresar quintupla manualmente AFD
+                    case "3":
                         CargarManual(automata);
                         break;
+                    // ingresar quintupla manualmente AFND
+                    case "4":
+                        automata = CargarAFNDManual();
+                        break;
                     // mostrar definicion formal y tabla de transicion
-                    case "3":
+                    case "5":
                         MostrarDefinicion(automata);
                         break;
                     // evaluar la cadena individual
-                    case "4":
+                    case "6":
                         EvaluarCadena(automata);
                         break;
                     // evaluar lote de cadenas
-                    case "5":
+                    case "7":
                         EvaluarLote(automata);
                         break;
                     // reiniciar / cargar nuevo automata
-                    case "6":
+                    case "8":
                         automata.Reiniciar();
                         Console.WriteLine();
                         Console.ForegroundColor = ConsoleColor.Green;
@@ -57,7 +67,7 @@ namespace ProyectoAutomata {
                         Pausar();
                         break;
                     // salir
-                    case "7":
+                    case "9":
                         salir = true;
                         Console.WriteLine();
                         Console.ForegroundColor = ConsoleColor.Green;
@@ -67,7 +77,7 @@ namespace ProyectoAutomata {
                     // default
                     default:
                         Console.WriteLine();
-                        Console.WriteLine("Opción inválida. Ingrese un número del 1 al 7.");
+                        Console.WriteLine("Opción inválida. Ingrese un número del 1 al 9.");
                         Pausar();
                         break;
                 }
@@ -75,7 +85,7 @@ namespace ProyectoAutomata {
         }
 
         // ------------------------------------------------------------
-        // OPCIÓN 1: CARGAR QUÍNTUPLA DESDE ARCHIVO
+        // OPCIÓN 1: CARGAR QUÍNTUPLA DESDE ARCHIVO *** AFD ***
         static void CargarDesdeArchivo(Automata automata) {
             Console.Clear();
 
@@ -114,7 +124,82 @@ namespace ProyectoAutomata {
         }
 
         // ------------------------------------------------------------
-        // OPCIÓN 2: INGRESAR QUÍNTUPLA MANUALMENTE
+        // OPCIÓN 2: CARGAR QUÍNTUPLA DESDE ARCHIVO *** AFND ***
+        static Automata CargarAFNDDesdeArchivo() {
+            Console.Clear();
+            Console.WriteLine("==============================================");
+            Console.WriteLine("      CARGAR QUÍNTUPLA AFND DESDE ARCHIVO");
+            Console.WriteLine("==============================================");
+            Console.WriteLine();
+
+            Console.Write("Ingrese el nombre del archivo .txt: ");
+            string nombreArchivo = Console.ReadLine();
+
+            if (string.IsNullOrWhiteSpace(nombreArchivo)) {
+                Console.WriteLine();
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Error: debe ingresar el nombre del archivo.");
+                Console.ResetColor();
+                Pausar();
+                return new Automata();
+            }
+            string ruta = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,nombreArchivo.Trim());
+            
+            try {
+                AFND afnd = new AFND();
+
+                // Cargar y validar AFND
+                afnd.CargarDesdeArchivo(ruta);
+
+                Console.WriteLine();
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("¡AFND cargado correctamente!");
+                Console.WriteLine("La quíntupla es válida.");
+                Console.ResetColor();
+
+                Console.WriteLine();
+
+                // Mostrar tabla del AFND
+                Console.WriteLine("==============================================");
+                Console.WriteLine("             TABLA DEL AFND");
+                Console.WriteLine("==============================================");
+                Console.WriteLine();
+                afnd.MostrarDefinicionYTabla();
+
+                // Transformar AFND a AFD
+                Automata nuevoAFD = afnd.TransformarAAFD();
+                Console.WriteLine();
+
+                // Mostrar AFD equivalente
+                Console.WriteLine("==============================================");
+                Console.WriteLine("              AFD EQUIVALENTE");
+                Console.WriteLine("==============================================");
+                Console.WriteLine();
+
+                nuevoAFD.MostrarDefinicionYTabla();
+
+                Console.WriteLine();
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("El AFND fue transformado correctamente a un AFD.");
+                Console.WriteLine("Las evaluaciones posteriores se realizarán sobre este AFD.");
+                Console.ResetColor();
+
+                Pausar();
+                return nuevoAFD;
+            }
+            catch (Exception ex) {
+                Console.WriteLine();
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("No se pudo cargar o transformar el AFND.");
+                Console.WriteLine("Error: " + ex.Message);
+                Console.ResetColor();
+                Pausar();
+                return new Automata();
+            }
+        }
+
+        // ------------------------------------------------------------
+        // OPCIÓN 3: INGRESAR QUÍNTUPLA MANUALMENTE ** AFD ***
         static void CargarManual(Automata automata) {
             Console.Clear();
             Console.WriteLine("==============================================");
@@ -188,6 +273,121 @@ namespace ProyectoAutomata {
             }
             Pausar();
         }
+
+        // ------------------------------------------------------------
+        // OPCIÓN 4: INGRESAR QUÍNTUPLA MANUALMENTE
+        static Automata CargarAFNDManual(){
+            Console.Clear();
+            Console.WriteLine("==============================================");
+            Console.WriteLine("          INGRESAR QUÍNTUPLA AFND");
+            Console.WriteLine("==============================================");
+            Console.WriteLine();
+
+            try {
+                // Q
+                Console.Write("Ingrese los estados Q separados por coma: ");
+                string entradaQ = Console.ReadLine();
+                HashSet<string> q = CrearConjunto(entradaQ);
+                // A
+                Console.Write("Ingrese los símbolos del alfabeto A separados por coma: ");
+                string entradaA = Console.ReadLine();
+                HashSet<string> a = CrearConjunto(entradaA);
+                // S
+                Console.Write("Ingrese el estado inicial S: ");
+                string s = Console.ReadLine();
+
+                if (string.IsNullOrWhiteSpace(s)) { throw new Exception("El estado inicial no puede estar vacío.");}
+                s = s.Trim();
+
+                // F
+                Console.Write("Ingrese los estados finales F separados por coma: ");
+                string entradaF = Console.ReadLine();
+                HashSet<string> f = CrearConjunto(entradaF);
+
+                // TRANSICIONES
+                Console.WriteLine();
+                Console.Write("¿Cuántas transiciones desea ingresar?: ");
+
+                string entradaCantidad = Console.ReadLine();
+
+                if (!int.TryParse(entradaCantidad,out int cantidadTransiciones)) { throw new Exception("La cantidad de transiciones debe ser un número entero.");}
+                if (cantidadTransiciones < 0) { throw new Exception("La cantidad de transiciones no puede ser negativa.");}
+
+                List<Transicion> transiciones = new List<Transicion>();
+
+                for (int i = 0; i < cantidadTransiciones; i++) {
+                    Console.WriteLine();
+                    Console.WriteLine($"Transición #{i + 1}");
+
+                    Console.Write("Estado origen: ");
+                    string origen = Console.ReadLine();
+
+                    Console.Write("Símbolo: ");
+                    string simbolo = Console.ReadLine();
+
+                    Console.Write("Estado destino: ");
+                    string destino = Console.ReadLine();
+
+                    if (string.IsNullOrWhiteSpace(origen) || string.IsNullOrWhiteSpace(simbolo) || string.IsNullOrWhiteSpace(destino)) {
+                        throw new Exception( "El origen, símbolo y destino no pueden estar vacíos.");
+                    }
+
+                    Transicion transicion = new Transicion(origen.Trim(),simbolo.Trim(),destino.Trim());
+                    transiciones.Add(transicion);
+                }
+                
+                // cargar y validar AFND
+                AFND afnd = new AFND();
+
+                afnd.CargarManual(q,a,s,f,transiciones);
+
+                Console.WriteLine();
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("¡AFND ingresado correctamente!");
+                Console.WriteLine("La quíntupla es válida.");
+                Console.ResetColor();
+
+                // mostrar tabla del AFND
+                Console.WriteLine();
+                Console.WriteLine("==============================================");
+                Console.WriteLine("             TABLA DEL AFND");
+                Console.WriteLine("==============================================");
+                Console.WriteLine();
+                afnd.MostrarDefinicionYTabla();
+
+                // transformar automáticamente AFND -> AFD
+                Automata nuevoAFD = afnd.TransformarAAFD();
+                Console.WriteLine();
+
+                // mstrar AFD equivalente
+                Console.WriteLine("==============================================");
+                Console.WriteLine("              AFD EQUIVALENTE");
+                Console.WriteLine("==============================================");
+                Console.WriteLine();
+
+                nuevoAFD.MostrarDefinicionYTabla();
+
+                Console.WriteLine();
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("El AFND fue transformado correctamente a un AFD.");
+                Console.WriteLine("Las evaluaciones posteriores se realizarán sobre este AFD.");
+                Console.ResetColor();
+
+                Pausar();
+                return nuevoAFD;
+            }
+            catch (Exception ex) {
+                Console.WriteLine();
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("No se pudo cargar o transformar el AFND.");
+                Console.WriteLine("Error: " + ex.Message);
+                Console.ResetColor();
+                Pausar();
+                return new Automata();
+            }
+        }
+        
+        // ------------------------------------------------------------
         // CREAR HASHSET A PARTIR DE UNA ENTRADA SEPARADA POR COMAS
         static HashSet<string> CrearConjunto(string entrada) {
             HashSet<string> conjunto = new HashSet<string>();
@@ -202,9 +402,9 @@ namespace ProyectoAutomata {
             }
             return conjunto;
         }
-
+        
         // ------------------------------------------------------------
-        // OPCIÓN 3: MOSTRAR DEFINICIÓN Y TABLA
+        // OPCIÓN 5: MOSTRAR DEFINICIÓN Y TABLA
         static void MostrarDefinicion(Automata automata){
             Console.Clear();
 
@@ -223,7 +423,7 @@ namespace ProyectoAutomata {
         }
 
         // ------------------------------------------------------------
-        // OPCIÓN 4: EVALUAR UNA CADENA
+        // OPCIÓN 6: EVALUAR UNA CADENA
         static void EvaluarCadena(Automata automata) {
             Console.Clear();
 
@@ -263,7 +463,7 @@ namespace ProyectoAutomata {
         }
 
         // ------------------------------------------------------------
-        // OPCIÓN 5: EVALUAR LOTE DESDE ARCHIVO
+        // OPCIÓN 7: EVALUAR LOTE DESDE ARCHIVO
         static void EvaluarLote(Automata automata) {
             Console.Clear();
 
@@ -366,28 +566,32 @@ namespace ProyectoAutomata {
         
         // ------------------------------------------------------------
         // MOSTRAR RESULTADO DE UNA SIMULACIÓN
-        static void MostrarResultado(ResultadoSimulacion resultado) {
+        static void MostrarResultado(ResultadoSimulacion resultado){
             Console.WriteLine();
             Console.WriteLine("==============================================");
             Console.WriteLine("                  TRAZA");
             Console.WriteLine("==============================================");
 
-            if (resultado.Traza.Count == 0) {
-                Console.WriteLine("La cadena es vacía (ε).");
+            if (resultado.Error != null){
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Error: " + resultado.Error);
+                Console.ResetColor();
+                return;
             }
-            else {
-                foreach (PasoTraza paso in resultado.Traza) { Console.WriteLine(paso); }
-            }
+
+            if (resultado.Traza.Count == 0){ Console.WriteLine("Cadena vacía: no se realizaron transiciones."); }
+            else { foreach (PasoTraza paso in resultado.Traza) { Console.WriteLine(paso);}}
+
             Console.WriteLine();
             Console.WriteLine("Estado final: " + resultado.EstadoFinal);
             Console.WriteLine();
 
-            if (resultado.Aceptada) { 
+            if (resultado.Aceptada){
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("VEREDICTO: ACEPTADA");
-                Console.ResetColor(); 
+                Console.ResetColor();
             }
-            else { 
+            else{
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("VEREDICTO: RECHAZADA");
                 Console.ResetColor();
