@@ -2,17 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace ProyectoAutomata
-{
-    class Program
-    {
-        static void Main(string[] args)
-        {
+namespace ProyectoAutomata {
+    class Program {
+        static void Main(string[] args) {
             AutomataPila automataPila = new AutomataPila();
             bool salir = false;
 
-            while (!salir)
-            {
+            while (!salir) {
                 LimpiarConsola();
 
                 Console.WriteLine("MOTOR DE AUTÓMATA DE PILA (APD)");
@@ -30,8 +26,7 @@ namespace ProyectoAutomata
 
                 string? opcion = Console.ReadLine();
 
-                switch (opcion)
-                {
+                switch (opcion) {
                     case "1":
                         CargarDesdeArchivo(automataPila);
                         break;
@@ -77,9 +72,7 @@ namespace ProyectoAutomata
         // ============================================================
         // MÉTODOS APD (FASE 3)
         // ============================================================
-
-        static void CargarDesdeArchivo(AutomataPila automata)
-        {
+        static void CargarDesdeArchivo(AutomataPila automata) {
             LimpiarConsola();
             Console.WriteLine("CARGAR AUTÓMATA DE PILA DESDE ARCHIVO");
             Console.WriteLine();
@@ -128,7 +121,6 @@ namespace ProyectoAutomata
 
             Pausar();
         }
-
         static void CargarManual(AutomataPila automata)
         {
             LimpiarConsola();
@@ -215,15 +207,11 @@ namespace ProyectoAutomata
 
             Pausar();
         }
-
-        static void MostrarDefinicion(AutomataPila automata)
-        {
+        static void MostrarDefinicion(AutomataPila automata){
             LimpiarConsola();
             Console.WriteLine("DEFINICIÓN Y TABLA DE TRANSICIÓN (APD)");
             Console.WriteLine();
-
-            if (!automata.EsValido)
-            {
+            if (!automata.EsValido) {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("No hay un autómata válido cargado.");
                 Console.WriteLine("Primero debe cargar o ingresar una tupla válida.");
@@ -231,19 +219,15 @@ namespace ProyectoAutomata
                 Pausar();
                 return;
             }
-
             automata.MostrarDefinicionYTabla();
             Pausar();
         }
-
-        static void EvaluarCadena(AutomataPila automata)
-        {
+        static void EvaluarCadena(AutomataPila automata) {
             LimpiarConsola();
             Console.WriteLine("EVALUAR CADENA INDIVIDUAL (APD)");
             Console.WriteLine();
 
-            if (!automata.EsValido)
-            {
+            if (!automata.EsValido) {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("No hay un autómata válido cargado.");
                 Console.WriteLine("Primero debe cargar o ingresar un autómata de pila.");
@@ -260,31 +244,25 @@ namespace ProyectoAutomata
             string? cadena = Console.ReadLine();
             if (cadena == null) cadena = "";
 
-            try
-            {
+            try {
                 ResultadoSimulacionAPD resultado = automata.EvaluarCadena(cadena);
                 MostrarResultado(resultado);
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 Console.WriteLine();
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("No se pudo evaluar la cadena.");
                 Console.WriteLine("Error: " + ex.Message);
                 Console.ResetColor();
             }
-
             Pausar();
         }
-
-        static void EvaluarLote(AutomataPila automata)
-        {
+        static void EvaluarLote(AutomataPila automata) {
             LimpiarConsola();
             Console.WriteLine("EVALUAR LOTE DE CADENAS (APD)");
             Console.WriteLine();
 
-            if (!automata.EsValido)
-            {
+            if (!automata.EsValido) {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("No hay un autómata válido cargado.");
                 Console.WriteLine("Primero debe cargar o ingresar un autómata de pila.");
@@ -292,12 +270,9 @@ namespace ProyectoAutomata
                 Pausar();
                 return;
             }
-
             Console.Write("Ingrese el nombre o ruta del archivo .txt con las cadenas: ");
             string? nombreArchivo = Console.ReadLine();
-
-            if (string.IsNullOrWhiteSpace(nombreArchivo))
-            {
+            if (string.IsNullOrWhiteSpace(nombreArchivo)) {
                 Console.WriteLine();
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("Error: debe ingresar el nombre del archivo.");
@@ -305,34 +280,28 @@ namespace ProyectoAutomata
                 Pausar();
                 return;
             }
-
             string rutaLimpia = nombreArchivo.Trim().Trim('"', '\'');
             string ruta = Path.IsPathRooted(rutaLimpia)
                 ? rutaLimpia
                 : Path.Combine(AppDomain.CurrentDomain.BaseDirectory, rutaLimpia);
 
-            if (!File.Exists(ruta))
-            {
+            if (!File.Exists(ruta)) {
                 string rutaDirecta = Path.Combine(Directory.GetCurrentDirectory(), rutaLimpia);
                 if (File.Exists(rutaDirecta)) ruta = rutaDirecta;
             }
 
-            try
-            {
+            try {
                 if (!File.Exists(ruta)) throw new FileNotFoundException("El archivo no existe.", ruta);
 
                 List<string> cadenas = new List<string>();
                 string[] lineas = File.ReadAllLines(ruta);
 
-                for (int i = 0; i < lineas.Length; i++)
-                {
+                for (int i = 0; i < lineas.Length; i++) {
                     string cad = lineas[i].Trim();
                     if (string.IsNullOrEmpty(cad)) continue;
                     cadenas.Add(cad);
                 }
-
-                if (cadenas.Count == 0)
-                {
+                if (cadenas.Count == 0) {
                     Console.WriteLine();
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("El archivo no contiene cadenas para evaluar.");
@@ -349,38 +318,28 @@ namespace ProyectoAutomata
                 int aceptadas = 0;
                 int rechazadas = 0;
 
-                for (int i = 0; i < resultados.Count; i++)
-                {
+                for (int i = 0; i < resultados.Count; i++) {
                     ResultadoSimulacionAPD res = resultados[i];
 
                     Console.WriteLine();
                     Console.WriteLine($"Cadena #{i + 1}: '{res.CadenaOriginal}'");
 
-                    if (res.Traza.Count == 0)
-                    {
-                        Console.WriteLine("Traza: [Sin transiciones ejecutadas]");
-                    }
-                    else
-                    {
+                    if (res.Traza.Count == 0) { Console.WriteLine("Traza: [Sin transiciones ejecutadas]"); }
+                    else {
                         Console.WriteLine("TRAZA:");
-                        foreach (PasoTrazaAPD paso in res.Traza)
-                        {
-                            Console.WriteLine("  " + paso);
-                        }
+                        foreach (PasoTrazaAPD paso in res.Traza) { Console.WriteLine("  " + paso); }
                     }
 
                     Console.WriteLine();
                     Console.WriteLine($"Estado final: {res.EstadoFinal} | Pila final: {res.PilaFinal}");
 
-                    if (res.Aceptada)
-                    {
+                    if (res.Aceptada) {
                         aceptadas++;
                         Console.ForegroundColor = ConsoleColor.Green;
                         Console.WriteLine("Veredicto: ACEPTADA");
                         Console.ResetColor();
                     }
-                    else
-                    {
+                    else {
                         rechazadas++;
                         Console.ForegroundColor = ConsoleColor.Red;
                         Console.WriteLine("Veredicto: RECHAZADA");
@@ -395,8 +354,7 @@ namespace ProyectoAutomata
                 Console.WriteLine();
                 Console.WriteLine($"RESUMEN: Total: {resultados.Count} | Aceptadas: {aceptadas} | Rechazadas: {rechazadas}");
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 Console.WriteLine();
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("No se pudo procesar el archivo de lote.");
@@ -406,37 +364,24 @@ namespace ProyectoAutomata
 
             Pausar();
         }
-
-        static void MostrarResultado(ResultadoSimulacionAPD resultado)
-        {
+        static void MostrarResultado(ResultadoSimulacionAPD resultado) {
             Console.WriteLine();
             Console.WriteLine("TRAZA");
 
-            if (resultado.Traza.Count == 0)
-            {
-                Console.WriteLine("No se ejecutaron pasos de transición.");
-            }
-            else
-            {
-                foreach (PasoTrazaAPD paso in resultado.Traza)
-                {
-                    Console.WriteLine(paso);
-                }
-            }
+            if (resultado.Traza.Count == 0) { Console.WriteLine("No se ejecutaron pasos de transición."); }
+            else { foreach (PasoTrazaAPD paso in resultado.Traza) { Console.WriteLine(paso); } }
 
             Console.WriteLine();
             Console.WriteLine($"Estado final: {resultado.EstadoFinal} | Pila final: {resultado.PilaFinal}");
             Console.WriteLine();
 
-            if (resultado.Aceptada)
-            {
+            if (resultado.Aceptada) {
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("VEREDICTO: Cadena ACEPTADA");
                 Console.WriteLine($"Motivo: Se consumió la totalidad de la cadena y el autómata finalizó en el estado de aceptación '{resultado.EstadoFinal}'.");
                 Console.ResetColor();
             }
-            else
-            {
+            else {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("VEREDICTO: Cadena RECHAZADA");
                 Console.WriteLine($"Motivo: {resultado.Error}");
@@ -447,7 +392,6 @@ namespace ProyectoAutomata
         // ============================================================
         // MÓDULO AFD / AFND (FASES 1 Y 2)
         // ============================================================
-
         static void MenuFasesAnteriores()
         {
             Automata automataAFD = new Automata();
@@ -514,9 +458,7 @@ namespace ProyectoAutomata
                 }
             }
         }
-
-        static void CargarDesdeArchivo(Automata automata)
-        {
+        static void CargarDesdeArchivo(Automata automata) {
             LimpiarConsola();
             Console.WriteLine("CARGAR QUÍNTUPLA AFD DESDE ARCHIVO");
             Console.WriteLine();
@@ -524,8 +466,7 @@ namespace ProyectoAutomata
             Console.Write("Ingrese el nombre del archivo .txt: ");
             string? nombreArchivo = Console.ReadLine();
 
-            if (string.IsNullOrWhiteSpace(nombreArchivo))
-            {
+            if (string.IsNullOrWhiteSpace(nombreArchivo)) {
                 Console.WriteLine();
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("Error: debe ingresar el nombre del archivo.");
@@ -535,9 +476,7 @@ namespace ProyectoAutomata
             }
             string ruta = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, nombreArchivo.Trim());
             if (!File.Exists(ruta)) ruta = Path.Combine(Directory.GetCurrentDirectory(), nombreArchivo.Trim());
-
-            try
-            {
+            try {
                 automata.CargarDesdeArchivo(ruta);
                 Console.WriteLine();
                 Console.ForegroundColor = ConsoleColor.Green;
@@ -545,8 +484,7 @@ namespace ProyectoAutomata
                 Console.WriteLine("La quíntupla es válida.");
                 Console.ResetColor();
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 Console.WriteLine();
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("No se pudo cargar el autómata.");
@@ -555,9 +493,7 @@ namespace ProyectoAutomata
             }
             Pausar();
         }
-
-        static Automata CargarAFNDDesdeArchivo()
-        {
+        static Automata CargarAFNDDesdeArchivo() {
             LimpiarConsola();
             Console.WriteLine("CARGAR AFND DESDE ARCHIVO Y TRANSFORMAR A AFD");
             Console.WriteLine();
@@ -565,8 +501,7 @@ namespace ProyectoAutomata
             Console.Write("Ingrese el nombre del archivo .txt: ");
             string? nombreArchivo = Console.ReadLine();
 
-            if (string.IsNullOrWhiteSpace(nombreArchivo))
-            {
+            if (string.IsNullOrWhiteSpace(nombreArchivo)) {
                 Console.WriteLine();
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("Error: debe ingresar el nombre del archivo.");
@@ -574,12 +509,9 @@ namespace ProyectoAutomata
                 Pausar();
                 return new Automata();
             }
-
             string ruta = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, nombreArchivo.Trim());
             if (!File.Exists(ruta)) ruta = Path.Combine(Directory.GetCurrentDirectory(), nombreArchivo.Trim());
-
-            try
-            {
+            try {
                 AFND afnd = new AFND();
                 afnd.CargarDesdeArchivo(ruta);
 
@@ -609,8 +541,7 @@ namespace ProyectoAutomata
                 Pausar();
                 return nuevoAFD;
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 Console.WriteLine();
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("No se pudo cargar o transformar el AFND.");
@@ -620,15 +551,12 @@ namespace ProyectoAutomata
                 return new Automata();
             }
         }
-
-        static void CargarManual(Automata automata)
-        {
+        static void CargarManual(Automata automata) {
             LimpiarConsola();
             Console.WriteLine("INGRESAR QUÍNTUPLA AFD MANUAL");
             Console.WriteLine();
 
-            try
-            {
+            try {
                 Console.Write("Ingrese los estados Q separados por coma: ");
                 string? entradaQ = Console.ReadLine();
                 HashSet<string> q = CrearConjunto(entradaQ ?? "");
@@ -656,8 +584,7 @@ namespace ProyectoAutomata
 
                 List<Transicion> transiciones = new List<Transicion>();
 
-                for (int i = 0; i < cantidadTransiciones; i++)
-                {
+                for (int i = 0; i < cantidadTransiciones; i++) {
                     Console.WriteLine();
                     Console.WriteLine($"--- Transición {i + 1} ---");
 
@@ -681,8 +608,7 @@ namespace ProyectoAutomata
                 Console.WriteLine("La quíntupla es válida.");
                 Console.ResetColor();
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 Console.WriteLine();
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("No se pudo cargar el autómata.");
@@ -691,15 +617,11 @@ namespace ProyectoAutomata
             }
             Pausar();
         }
-
-        static Automata CargarAFNDManual()
-        {
+        static Automata CargarAFNDManual() {
             LimpiarConsola();
             Console.WriteLine("INGRESAR QUÍNTUPLA AFND MANUAL");
             Console.WriteLine();
-
-            try
-            {
+            try {
                 Console.Write("Ingrese los estados Q separados por coma: ");
                 string? entradaQ = Console.ReadLine();
                 HashSet<string> q = CrearConjunto(entradaQ ?? "");
@@ -727,8 +649,7 @@ namespace ProyectoAutomata
 
                 List<Transicion> transiciones = new List<Transicion>();
 
-                for (int i = 0; i < cantidadTransiciones; i++)
-                {
+                for (int i = 0; i < cantidadTransiciones; i++) {
                     Console.WriteLine();
                     Console.WriteLine($"--- Transición {i + 1} ---");
 
@@ -741,8 +662,7 @@ namespace ProyectoAutomata
                     Console.Write("Estado destino: ");
                     string? destino = Console.ReadLine();
 
-                    if (string.IsNullOrWhiteSpace(origen) || string.IsNullOrWhiteSpace(simbolo) || string.IsNullOrWhiteSpace(destino))
-                    {
+                    if (string.IsNullOrWhiteSpace(origen) || string.IsNullOrWhiteSpace(simbolo) || string.IsNullOrWhiteSpace(destino)) {
                         throw new Exception("El origen, símbolo y destino no pueden estar vacíos.");
                     }
 
@@ -778,8 +698,7 @@ namespace ProyectoAutomata
                 Pausar();
                 return nuevoAFD;
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 Console.WriteLine();
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("No se pudo cargar o transformar el AFND.");
@@ -789,15 +708,12 @@ namespace ProyectoAutomata
                 return new Automata();
             }
         }
-
-        static void MostrarDefinicion(Automata automata)
-        {
+        static void MostrarDefinicion(Automata automata) {
             LimpiarConsola();
             Console.WriteLine("DEFINICIÓN Y TABLA (AFD)");
             Console.WriteLine();
 
-            if (!automata.EsValido)
-            {
+            if (!automata.EsValido) {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("No hay un autómata válido cargado.");
                 Console.WriteLine("Primero debe cargar o ingresar una quíntupla.");
@@ -808,15 +724,12 @@ namespace ProyectoAutomata
             automata.MostrarDefinicionYTabla();
             Pausar();
         }
-
-        static void EvaluarCadena(Automata automata)
-        {
+        static void EvaluarCadena(Automata automata) {
             LimpiarConsola();
             Console.WriteLine("EVALUAR CADENA INDIVIDUAL (AFD)");
             Console.WriteLine();
 
-            if (!automata.EsValido)
-            {
+            if (!automata.EsValido) {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("No hay un autómata válido cargado.");
                 Console.WriteLine("Primero debe cargar o ingresar una quíntupla.");
@@ -832,13 +745,11 @@ namespace ProyectoAutomata
             string? cadena = Console.ReadLine();
             if (cadena == null) cadena = "";
 
-            try
-            {
+            try {
                 ResultadoSimulacion resultado = automata.EvaluarCadena(cadena);
                 MostrarResultado(resultado);
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 Console.WriteLine();
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("No se pudo evaluar la cadena.");
@@ -847,15 +758,12 @@ namespace ProyectoAutomata
             }
             Pausar();
         }
-
-        static void EvaluarLote(Automata automata)
-        {
+        static void EvaluarLote(Automata automata) {
             LimpiarConsola();
             Console.WriteLine("EVALUAR LOTE DE CADENAS (AFD)");
             Console.WriteLine();
 
-            if (!automata.EsValido)
-            {
+            if (!automata.EsValido) {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("No hay un autómata válido cargado.");
                 Console.WriteLine("Primero debe cargar o ingresar una quíntupla.");
@@ -867,8 +775,7 @@ namespace ProyectoAutomata
             Console.Write("Ingrese el nombre del archivo .txt: ");
             string? nombreArchivo = Console.ReadLine();
 
-            if (string.IsNullOrWhiteSpace(nombreArchivo))
-            {
+            if (string.IsNullOrWhiteSpace(nombreArchivo)) {
                 Console.WriteLine();
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("Error: debe ingresar el nombre del archivo.");
@@ -879,21 +786,18 @@ namespace ProyectoAutomata
             string ruta = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, nombreArchivo.Trim());
             if (!File.Exists(ruta)) ruta = Path.Combine(Directory.GetCurrentDirectory(), nombreArchivo.Trim());
 
-            try
-            {
+            try {
                 if (!File.Exists(ruta)) throw new FileNotFoundException("El archivo no existe.", ruta);
 
                 List<string> cadenas = new List<string>();
                 string[] lineas = File.ReadAllLines(ruta);
 
-                for (int i = 0; i < lineas.Length; i++)
-                {
+                for (int i = 0; i < lineas.Length; i++) {
                     string cad = lineas[i].Trim();
                     if (string.IsNullOrEmpty(cad)) continue;
                     cadenas.Add(cad);
                 }
-                if (cadenas.Count == 0)
-                {
+                if (cadenas.Count == 0) {
                     Console.WriteLine();
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("El archivo no contiene cadenas para evaluar.");
@@ -907,38 +811,27 @@ namespace ProyectoAutomata
                 Console.WriteLine();
                 Console.WriteLine("RESULTADOS DEL LOTE");
 
-                for (int i = 0; i < resultados.Count; i++)
-                {
+                for (int i = 0; i < resultados.Count; i++) {
                     ResultadoSimulacion resultado = resultados[i];
-
                     Console.WriteLine();
                     Console.WriteLine($"Cadena #{i + 1}: {resultado.CadenaOriginal}");
 
-                    if (!string.IsNullOrEmpty(resultado.Error))
-                    {
-                        Console.WriteLine("Error: " + resultado.Error);
-                    }
-                    else
-                    {
+                    if (!string.IsNullOrEmpty(resultado.Error)) { Console.WriteLine("Error: " + resultado.Error); }
+                    else {
                         Console.WriteLine();
                         Console.WriteLine("TRAZA:");
 
-                        foreach (PasoTraza paso in resultado.Traza)
-                        {
-                            Console.WriteLine(paso);
-                        }
+                        foreach (PasoTraza paso in resultado.Traza) { Console.WriteLine(paso); }
 
                         Console.WriteLine();
                         Console.WriteLine("Estado final: " + resultado.EstadoFinal);
 
-                        if (resultado.Aceptada)
-                        {
+                        if (resultado.Aceptada) {
                             Console.ForegroundColor = ConsoleColor.Green;
                             Console.WriteLine("Resultado: ACEPTADA");
                             Console.ResetColor();
                         }
-                        else
-                        {
+                        else {
                             Console.ForegroundColor = ConsoleColor.Red;
                             Console.WriteLine("Resultado: RECHAZADA");
                             Console.ResetColor();
@@ -957,87 +850,57 @@ namespace ProyectoAutomata
 
             Pausar();
         }
-
-        static void MostrarResultado(ResultadoSimulacion resultado)
-        {
+        static void MostrarResultado(ResultadoSimulacion resultado) {
             Console.WriteLine();
             Console.WriteLine("TRAZA");
-
-            if (resultado.Error != null)
-            {
+            if (resultado.Error != null) {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("Error: " + resultado.Error);
                 Console.ResetColor();
                 return;
             }
 
-            if (resultado.Traza.Count == 0)
-            {
-                Console.WriteLine("Cadena vacía: no se realizaron transiciones.");
-            }
-            else
-            {
-                foreach (PasoTraza paso in resultado.Traza)
-                {
-                    Console.WriteLine(paso);
-                }
-            }
+            if (resultado.Traza.Count == 0) { Console.WriteLine("Cadena vacía: no se realizaron transiciones."); }
+            else { foreach (PasoTraza paso in resultado.Traza) { Console.WriteLine(paso); } }
 
             Console.WriteLine();
             Console.WriteLine("Estado final: " + resultado.EstadoFinal);
             Console.WriteLine();
 
-            if (resultado.Aceptada)
-            {
+            if (resultado.Aceptada) {
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("VEREDICTO: ACEPTADA");
                 Console.ResetColor();
             }
-            else
-            {
+            else {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("VEREDICTO: RECHAZADA");
                 Console.ResetColor();
             }
         }
-
+        
         // ============================================================
         // UTILIDADES COMUNES
         // ============================================================
-
-        static HashSet<string> CrearConjunto(string entrada)
-        {
+        static HashSet<string> CrearConjunto(string entrada) {
             HashSet<string> conjunto = new HashSet<string>();
             if (string.IsNullOrWhiteSpace(entrada)) return conjunto;
 
             string[] elementos = entrada.Split(',');
-            foreach (string elemento in elementos)
-            {
+            foreach (string elemento in elementos) {
                 string valor = elemento.Trim();
-                if (!string.IsNullOrEmpty(valor))
-                {
-                    conjunto.Add(valor);
-                }
+                if (!string.IsNullOrEmpty(valor)) { conjunto.Add(valor); }
             }
             return conjunto;
         }
-
-        static void Pausar()
-        {
+        static void Pausar() {
             Console.WriteLine();
             Console.WriteLine("Presione ENTER para continuar...");
             Console.ReadLine();
         }
-
-        static void LimpiarConsola()
-        {
-            try
-            {
-                Console.Clear();
-            }
-            catch
-            {
-            }
+        static void LimpiarConsola() {
+            try { Console.Clear(); }
+            catch {}
         }
     }
 }
